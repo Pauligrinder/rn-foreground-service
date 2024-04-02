@@ -13,28 +13,28 @@ const metadataTemplate = `
     android:name="com.supersami.foregroundservice.notification_color"
     android:resource="@color/blue"
   />
-  <service android:name="com.supersami.foregroundservice.ForegroundService"></service>
-  <service android:name="com.supersami.foregroundservice.ForegroundServiceTask"></service>
+  <service android:name="com.supersami.foregroundservice.ForegroundService" android:foregroundServiceType="location" android:exported="false"></service>
+  <service android:name="com.supersami.foregroundservice.ForegroundServiceTask" android:foregroundServiceType="location" android:exported="false"></service>
 `;
 
 const androidManifestPath = `${process.cwd()}/android/app/src/main/AndroidManifest.xml`;
 
 fs.readFile(androidManifestPath, "utf8", function (err, data) {
-  if (err) {
-    return console.log(err);
-  }
+    if (err) {
+        return console.log(err);
+    }
 
-  if (!data.includes(metadataTemplate)) {
-    const reg = /<application[^>]*>/;
-    const content = reg.exec(data)[0];
+    if (!data.includes(metadataTemplate)) {
+        const reg = /<application[^>]*>/;
+        const content = reg.exec(data)[0];
 
-    const result = data.replace(reg, `${content}${metadataTemplate}`);
-    console.log({ result });
+        const result = data.replace(reg, `${content}${metadataTemplate}`);
+        console.log({ result });
 
-    fs.writeFile(androidManifestPath, result, "utf8", function (err) {
-      if (err) return console.log(err);
-    });
-  }
+        fs.writeFile(androidManifestPath, result, "utf8", function (err) {
+            if (err) return console.log(err);
+        });
+    }
 });
 
 const colorTemplate = `
@@ -50,9 +50,9 @@ const colorTemplate = `
 const colorFilePath = `${process.cwd()}/android/app/src/main/res/values/colors.xml`;
 
 fs.writeFile(colorFilePath, colorTemplate, "utf8", function (err) {
-  if (err) {
-    return console.log(err);
-  }
+    if (err) {
+        return console.log(err);
+    }
 
-  console.log(`Successfully created color file at ${colorFilePath}`);
+    console.log(`Successfully created color file at ${colorFilePath}`);
 });
