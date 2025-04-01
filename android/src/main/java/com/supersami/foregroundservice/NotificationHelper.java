@@ -12,9 +12,17 @@ import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import androidx.core.app.NotificationCompat;
+
+import android.transition.Visibility;
 import android.util.Log;
+import android.util.TypedValue;
+import android.view.View;
+import android.widget.ProgressBar;
+import android.widget.RemoteViews;
 
 import com.facebook.react.R;
+
+import kotlin.Unit;
 
 
 // partially took ideas from: https://github.com/zo0r/react-native-push-notification/blob/master/android/src/main/java/com/dieam/reactnativepushnotification/modules/RNPushNotificationHelper.java
@@ -130,15 +138,18 @@ class NotificationHelper {
             }
         }
 
+        String body = bundle.getString("message");
+
         checkOrCreateChannel(mNotificationManager, bundle);
 
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID)
+            .setSilent(bundle.getBoolean(("silent"), true))
             .setContentTitle(title)
             .setVisibility(visibility)
             .setPriority(priority)
             .setContentIntent(pendingIntent)
-            .setOngoing(bundle.getBoolean("ongoing", false))
-            .setContentText(bundle.getString("message"));
+            .setOngoing(bundle.getBoolean("ongoing", true))
+            .setContentText(body);
 
        
 
@@ -156,11 +167,12 @@ class NotificationHelper {
             notificationBuilder.setColor(this.config.getNotificationColor());
         }
         String color = bundle.getString("color");
-        if(color != null){
-            notificationBuilder.setColor(Color.parseColor(color));
+        if(color != null)
+        {
+            notificationBuilder
+                    .setColor(Color.parseColor(color))
+                    .setColorized(true);
         }
-
-        notificationBuilder.setStyle(new NotificationCompat.BigTextStyle().bigText(bundle.getString("message")));
 
 
         String iconName = bundle.getString("icon"); ;
@@ -191,7 +203,7 @@ class NotificationHelper {
             }
         }
 
-        Boolean progress = bundle.getBoolean("progressBar");
+        boolean progress = bundle.getBoolean("progressBar");
         if(progress){
             double max = bundle.getDouble("progressBarMax");
             double curr = bundle.getDouble("progressBarCurr");
@@ -200,6 +212,9 @@ class NotificationHelper {
 
         notificationBuilder.setOnlyAlertOnce(true);
 
+
+
+        
 
         return notificationBuilder.build();
     }
